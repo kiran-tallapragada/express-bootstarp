@@ -1,31 +1,46 @@
 var express = require('express')
 var app = express()
 var fs = require('fs')
-var _  = require('lodash')
+var path = require('path')
+var _ = require('lodash')
 var engines = require('consolidate')
-var  users = []
-
-fs.readFile('users.json', {encoding: 'utf8'}, function (err,data) {
-    if(err) throw  err;
-    JSON.parse(data).forEach(function (user) {
-        user.name.full = _.startCase(user.name.first+' '+user.name.last)
-        users.push(user)
-    })
-})
-
 app.engine('hbs',engines.handlebars)
 app.set('views','./views')
 app.set('view engine','hbs')
 app.use('/profile', express.static('images'))
-
 app.get('/',function (req,res) {
-    res.render('index',{users: users})
+
+  var  users = []
+  fs.readdir('users',function (err,files) {
+    files.forEach(function (file) {
+      fs.readFile(path.join(__dirname,'users',file),{encoding:'utf8'},function (err,data) {
+        if(err) {
+          throw err
+        }
+        var user = JSON.parse(data)
+        user.name.full = _.startCase(user.name.first+' '+user.name.last)
+        users.push(user)
+        if(users.length === files.length) {
+          res.render('index',{users:users})
+        }
+      })
+    })
+  })
 })
 
 app.get('/:username',function (req,res) {
-    res.render('user',{username: req.params.username})
+  var user = getUser(req.params.username)
+  res.render('user',{username: req.params.username})
 })
 
-var server = app.listen(3000,function () {
+function getUserFilePath(username) {
+  return path.join(__dirname,'users',username+'.json')
+}
+function getUser(username) {
+    var user = JSON.parse(fs.readFileSync(getUserFilePath(username),{encoding:'utf8'}))
+    return user;
+}
+
+var server = app.listen(3020,function () {
     console.log('Sever running at http://localhost:'+server.address().port)
 })
