@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Express hsb engine</h1>
+<ul>
+    {{#each users as |user|}}
+    <li>
+        <a href="/{{user.username}}">{{user.name.full}}</a>
+    </li>
+    {{/each}}
+</ul>
+</body>
+</html>
