@@ -10,6 +10,7 @@ app.set('view engine','hbs')
 app.use('/profile', express.static('images'))
 app.get('/',function (req,res) {
 
+  //build trigger
   var  users = []
   fs.readdir('users',function (err,files) {
     files.forEach(function (file) {
